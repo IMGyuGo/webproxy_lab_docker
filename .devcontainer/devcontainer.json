@@ -2,6 +2,18 @@
     "name": "Proxylab Development Container",
     "dockerFile": "Dockerfile",
     "remoteUser": "jungle",
+    "forwardPorts": [
+        12345
+    ],
+    "portsAttributes": {
+        "3000": {
+            "label": "Application",
+            "onAutoForward": "notify"
+        },
+        "12345": {
+            "label": "echoserver"
+        }
+    },
     "customizations": {
         "vscode": {
             "extensions": [

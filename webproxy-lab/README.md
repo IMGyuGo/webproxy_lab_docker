@@ -1,49 +1,112 @@
+# 새로만든파일 빌드 방법
+```
+gcc -g -Wall hostinfo.c csapp.c -o hostinfo -lpthread
+gcc -g -Wall echo.c echoclient.c echoserveri.c -o 
+```
+
 ####################################################################
 # CS:APP Proxy Lab
 #
-# Student Source Files
+# 학생용 소스 파일
 ####################################################################
 
-This directory contains the files you will need for the CS:APP Proxy
-Lab.
+이 디렉터리에는 CS:APP Proxy Lab을 수행하는 데 필요한 파일들이
+들어 있습니다.
 
 proxy.c
 csapp.h
 csapp.c
-    These are starter files.  csapp.c and csapp.h are described in
-    your textbook. 
+    이 파일들은 시작용 파일입니다. `csapp.c`와 `csapp.h`에 대한
+    설명은 교재에 나와 있습니다.
 
-    You may make any changes you like to these files.  And you may
-    create and handin any additional files you like.
+    이 파일들은 자유롭게 수정해도 됩니다. 또한 필요한 추가 파일을
+    만들어 함께 제출해도 됩니다.
 
-    Please use `port-for-user.pl' or 'free-port.sh' to generate
-    unique ports for your proxy or tiny server. 
+    프록시나 tiny 서버에 사용할 고유한 포트를 만들 때는
+    `port-for-user.pl` 또는 `free-port.sh`를 사용하세요.
 
 Makefile
-    This is the makefile that builds the proxy program.  Type "make"
-    to build your solution, or "make clean" followed by "make" for a
-    fresh build. 
+    프록시 프로그램을 빌드하는 메이크파일입니다. 해답을 빌드하려면
+    `make`를 실행하고, 완전히 새로 빌드하려면 `make clean` 다음
+    `make`를 실행하세요.
 
-    Type "make handin" to create the tarfile that you will be handing
-    in. You can modify it any way you like. Your instructor will use your
-    Makefile to build your proxy from source.
+    제출할 tar 파일을 만들려면 `make handin`을 실행하세요. 원하는
+    대로 수정해도 됩니다. 강의자는 이 `Makefile`을 사용해 소스
+    코드로부터 여러분의 프록시를 빌드합니다.
 
 port-for-user.pl
-    Generates a random port for a particular user
-    usage: ./port-for-user.pl <userID>
+    특정 사용자용 임의 포트를 생성합니다.
+    사용법: `./port-for-user.pl <userID>`
 
 free-port.sh
-    Handy script that identifies an unused TCP port that you can use
-    for your proxy or tiny. 
-    usage: ./free-port.sh
+    프록시나 tiny에서 사용할 수 있는, 현재 비어 있는 TCP 포트를
+    찾아주는 유용한 스크립트입니다.
+    사용법: `./free-port.sh`
 
 driver.sh
-    The autograder for Basic, Concurrency, and Cache.        
-    usage: ./driver.sh
+    Basic, Concurrency, Cache를 위한 자동 채점기입니다.
+    사용법: `./driver.sh`
 
 nop-server.py
-     helper for the autograder.         
+     자동 채점기를 돕는 보조 스크립트입니다.
 
 tiny
-    Tiny Web server from the CS:APP text
+    CS:APP 교재에 나오는 Tiny 웹 서버입니다.
+
+
+## 이 폴더만 보고 정리한 직접 구현 범위
+
+아래 내용은 `webproxy-lab` 폴더 안의 파일들만 보고 추론한 구현 범위입니다.
+
+1. 핵심 구현 대상은 `proxy.c`입니다.
+   현재 `proxy.c`는 `user_agent_hdr`를 출력하고 종료하는 최소 골격만 들어 있으므로,
+   실제 프록시 서버 로직은 거의 전부 직접 구현해야 합니다.
+
+2. 구현의 중심은 프록시 서버 실행 파일 `proxy`를 만드는 것입니다.
+   `Makefile` 기준으로 `make`를 실행하면 `proxy`가 빌드되어야 하고,
+   `driver.sh`는 `./proxy <port>` 형식으로 이 프로그램을 실행합니다.
+   따라서 명령행 인자로 포트를 받아 리슨 소켓을 열고 요청을 받아야 합니다.
+
+3. 기본 기능(Basic)은 반드시 직접 구현해야 합니다.
+   `driver.sh`는 프록시를 통해 Tiny 서버의 `home.html`, `csapp.c`, `tiny.c`,
+   `godzilla.jpg`, `tiny` 파일을 받아 원본과 같은지 비교합니다.
+   즉, 최소한 다음 기능이 필요합니다.
+   - 클라이언트의 HTTP 요청 읽기
+   - 목적 서버(Tiny)에 연결하기
+   - 서버 응답을 클라이언트에게 그대로 전달하기
+   - 텍스트뿐 아니라 바이너리 파일도 깨지지 않게 전달하기
+
+4. 동시성(Concurrency)도 직접 구현해야 합니다.
+   `nop-server.py`는 연결을 받은 뒤 응답하지 않고 계속 멈춰 있는 서버입니다.
+   `driver.sh`는 프록시가 이 막힌 요청 하나를 처리하는 동안에도 다른 Tiny 요청을
+   계속 처리할 수 있는지 검사합니다.
+   따라서 요청을 한 번에 하나씩만 처리하는 순차 구조로는 부족하고,
+   동시에 여러 연결을 처리할 수 있는 구조가 필요합니다.
+
+5. 캐시(Cache) 기능도 직접 구현해야 합니다.
+   `driver.sh`는 프록시를 통해 `tiny.c`, `home.html`, `csapp.c`를 먼저 받아온 뒤
+   Tiny 서버를 종료시키고, 그 이후에도 `home.html`을 프록시가 다시 제공할 수
+   있는지 확인합니다.
+   따라서 이전에 받아온 응답을 저장해 두었다가, 원 서버가 죽어도 캐시된 객체를
+   반환하는 기능이 필요합니다.
+
+6. 캐시 크기 힌트는 `proxy.c` 안에 이미 주어져 있습니다.
+   `MAX_OBJECT_SIZE`와 `MAX_CACHE_SIZE`는 각각 개별 객체 크기와 전체 캐시 크기
+   제한을 위한 상수로 보이며, 캐시 구현 시 사용할 의도가 분명합니다.
+
+7. 직접 구현의 주 무대는 `proxy.c`이지만, 추가 파일을 만들어도 됩니다.
+   이 README와 Makefile 설명에 따르면 `proxy.c`, `csapp.c`, `csapp.h`는
+   자유롭게 수정할 수 있고, 필요한 추가 파일을 만들어 함께 제출해도 됩니다.
+
+8. 직접 구현 대상이 아닌 보조 파일도 구분해 볼 수 있습니다.
+   - `tiny/`는 원본 웹 서버와 테스트용 콘텐츠입니다.
+   - `driver.sh`는 자동 채점 스크립트입니다.
+   - `nop-server.py`는 동시성 테스트를 위한 보조 서버입니다.
+   - `port-for-user.pl`, `free-port.sh`는 포트 선택을 돕는 유틸리티입니다.
+   - `csapp.c`, `csapp.h`는 소켓, 스레드, Robust I/O 등을 위한 지원 코드입니다.
+
+정리하면, 이 폴더만 보고 판단했을 때 여러분이 직접 완성해야 하는 핵심은
+`proxy.c`를 중심으로 한 "동시성 있는 캐시 프록시 서버"입니다. 최소 요구사항은
+"Tiny와 통신하는 기본 프록시 기능 + 동시에 여러 요청 처리 + 캐시 제공"이라고
+볼 수 있습니다.
 

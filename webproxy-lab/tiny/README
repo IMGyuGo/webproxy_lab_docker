@@ -1,38 +1,39 @@
-Tiny Web server
+Tiny 웹 서버
 Dave O'Hallaron
 Carnegie Mellon University
 
-This is the home directory for the Tiny server, a 200-line Web
-server that we use in "15-213: Intro to Computer Systems" at Carnegie
-Mellon University.  Tiny uses the GET method to serve static content
-(text, HTML, GIF, and JPG files) out of ./ and to serve dynamic
-content by running CGI programs out of ./cgi-bin. The default 
-page is home.html (rather than index.html) so that we can view
-the contents of the directory from a browser.
+이 디렉터리는 Carnegie Mellon University의 "15-213: Intro to Computer
+Systems" 과목에서 사용하는 약 200줄짜리 웹 서버인 Tiny의 홈
+디렉터리입니다. Tiny는 GET 메서드를 사용해 `./` 아래의 정적 콘텐츠
+(텍스트, HTML, GIF, JPG 파일)를 제공하고, `./cgi-bin` 아래의 CGI
+프로그램을 실행해 동적 콘텐츠를 제공합니다. 기본 페이지는
+`index.html`이 아니라 `home.html`인데, 이는 브라우저에서 디렉터리
+내용을 볼 수 있게 하기 위해서입니다.
 
-Tiny is neither secure nor complete, but it gives students an
-idea of how a real Web server works. Use for instructional purposes only.
+Tiny는 보안성이 높지도 않고 완전한 구현도 아니지만, 실제 웹 서버가
+어떻게 동작하는지 학생들이 감을 잡는 데 도움이 됩니다. 교육용으로만
+사용하세요.
 
-The code compiles and runs cleanly using gcc 2.95.3 
-on a Linux 2.2.20 kernel.
+이 코드는 Linux 2.2.20 커널 환경에서 gcc 2.95.3을 사용해 문제없이
+컴파일되고 실행됩니다.
 
-To install Tiny:
-   Type "tar xvf tiny.tar" in a clean directory. 
+Tiny 설치 방법:
+   빈 디렉터리에서 `tar xvf tiny.tar`를 실행하세요.
 
-To run Tiny:
-   Run "tiny <port>" on the server machine, 
-	e.g., "tiny 8000".
-   Point your browser at Tiny: 
-	static content: http://<host>:8000
-	dynamic content: http://<host>:8000/cgi-bin/adder?1&2
+Tiny 실행 방법:
+   서버 머신에서 `tiny <port>`를 실행하세요.
+	예: `tiny 8000`
+   브라우저에서 Tiny에 접속하세요.
+	정적 콘텐츠: `http://<host>:8000`
+	동적 콘텐츠: `http://<host>:8000/cgi-bin/adder?1&2`
 
-Files:
-  tiny.tar		Archive of everything in this directory
-  tiny.c		The Tiny server
-  Makefile		Makefile for tiny.c
-  home.html		Test HTML page
-  godzilla.gif		Image embedded in home.html
-  README		This file	
-  cgi-bin/adder.c	CGI program that adds two numbers
-  cgi-bin/Makefile	Makefile for adder.c
+파일 목록:
+  tiny.tar		이 디렉터리 전체를 담은 아카이브
+  tiny.c		Tiny 서버
+  Makefile		tiny.c용 메이크파일
+  home.html		테스트용 HTML 페이지
+  godzilla.gif		home.html에 포함된 이미지
+  README		이 파일
+  cgi-bin/adder.c	두 수를 더하는 CGI 프로그램
+  cgi-bin/Makefile	adder.c용 메이크파일
 
