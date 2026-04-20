@@ -941,6 +941,25 @@ ssize_t rio_writen(int fd, void *usrbuf, size_t n)
     {
         if ((nwritten = write(fd, bufp, nleft)) <= 0)
         {
+            /**
+             *  대표 상황:
+
+                read(), write(), accept(), select() 같은
+                블로킹 시스템 콜 수행 중
+
+                👉 그때
+
+                SIGINT (Ctrl+C)
+                SIGALRM
+                기타 signal
+
+                이 오면…
+
+                👉 커널이 시스템 콜을 멈추고 -1 반환
+                👉 그리고 errno = EINTR
+
+                -> 오류가 아님 잠시 끊긴 것 -> 다시 시도 하면 됨
+             */
             if (errno == EINTR) /* 시그널 핸들러 복귀로 중단됨 */
                 nwritten = 0;   /* 그리고 write()를 다시 호출 */
             else
